@@ -1,0 +1,432 @@
+:root {
+    --bg-color: #f0f0f0;
+    --text-color: #333;
+    --header-bg: #333;
+    --card-bg: white;
+    --input-bg: white;
+    --input-border: #ddd;
+    --success-color: #4CAF50;
+    --warning-color: #FF9800;
+    --error-color: #f44336;
+}
+
+.dark-mode {
+    --bg-color: #1a1a1a;
+    --text-color: #fff;
+    --header-bg: #2d2d2d;
+    --card-bg: #2d2d2d;
+    --input-bg: #3d3d3d;
+    --input-border: #4d4d4d;
+}
+
+body { 
+    font-family: Arial, sans-serif; 
+    margin: 0; 
+    padding: 0; 
+    background: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s;
+}
+
+/* Header */
+.header { 
+    background: var(--header-bg); 
+    color: white; 
+    padding: 15px;
+    height: 30px;
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    right: 0; 
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Config Panel */
+.config-panel {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    background: var(--card-bg);
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    z-index: 90;
+}
+
+.config-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.config-panel input {
+    padding: 8px;
+    width: 150px;
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+    background: var(--input-bg);
+    color: var(--text-color);
+}
+
+.config-panel button {
+    padding: 8px 15px;
+    background: var(--success-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    white-space: nowrap;
+}
+
+.config-panel button:hover {
+    opacity: 0.9;
+}
+
+.config-status {
+    color: var(--text-color);
+    font-size: 0.9em;
+    border-left: 1px solid var(--input-border);
+    padding-left: 15px;
+    margin-left: 5px;
+}
+
+/* Monitor Grid */
+.monitor-grid {
+    margin-top: 120px;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.monitor-card {
+    background: var(--card-bg);
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    min-height: 120px;
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: var(--text-color);
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 10px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 4px;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+.stat-value {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+/* Response Times */
+.response-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.response-current {
+    text-align: center;
+    flex: 1;
+}
+
+.response-current div:first-child {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.response-details {
+    flex: 1;
+    padding-left: 15px;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+/* Status Codes */
+.status-codes {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.status-category {
+    padding: 8px;
+    border-radius: 4px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.status-category.success { background-color: rgba(76, 175, 80, 0.2); color: var(--success-color); }
+.status-category.warning { background-color: rgba(255, 152, 0, 0.2); color: var(--warning-color); }
+.status-category.error { background-color: rgba(244, 67, 54, 0.2); color: var(--error-color); }
+
+/* Endpoints List */
+.endpoints-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.endpoint-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.endpoint-url {
+    margin: 0 8px;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.endpoint-count {
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+/* Container for Requests */
+.container {
+    margin-top: 20px;
+    padding: 0 20px 20px;
+}
+
+/* Toolbar */
+.toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.search-bar {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+    background: var(--input-bg);
+    color: var(--text-color);
+}
+
+.toolbar-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.action-button, .filter-select {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    background: var(--header-bg);
+    color: white;
+    cursor: pointer;
+}
+
+/* Request Styling */
+.request {
+    background: var(--card-bg);
+    margin: 10px 0;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    animation: slideIn 0.3s ease-out;
+}
+
+.request-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+/* Method Badges */
+.method {
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 3px;
+    color: white;
+    font-size: 12px;
+}
+
+.method-GET { background: #2196F3; }
+.method-POST { background: var(--success-color); }
+.method-PUT { background: var(--warning-color); }
+.method-DELETE { background: var(--error-color); }
+
+/* URL Display */
+.url {
+    margin: 0 8px;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+/* Payload Type Badge */
+.payload-type {
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    margin-left: 8px;
+}
+
+.json-type { background: var(--warning-color); color: white; }
+.xml-type { background: #2196F3; color: white; }
+
+/* Status Code Badge */
+.status-code {
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    margin-left: 8px;
+}
+
+.status-2xx { background: rgba(76, 175, 80, 0.2); color: var(--success-color); }
+.status-4xx { background: rgba(255, 152, 0, 0.2); color: var(--warning-color); }
+.status-5xx { background: rgba(244, 67, 54, 0.2); color: var(--error-color); }
+
+/* Request Actions */
+.request-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.timestamp, .response-time {
+    color: var(--text-color);
+    opacity: 0.7;
+    font-size: 12px;
+}
+
+.copy-btn {
+    padding: 4px 8px;
+    background: #666;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.2s;
+}
+
+.copy-btn:hover {
+    background: #555;
+}
+
+/* Theme Toggle */
+.theme-toggle {
+    padding: 5px 10px;
+    background: #666;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+/* Status Indicator */
+#status {
+    padding: 5px 10px;
+    border-radius: 3px;
+}
+
+.status-active { background: var(--success-color); }
+.status-inactive { background: var(--error-color); }
+
+/* Code Highlighting */
+pre {
+    margin: 10px 0 0 0;
+    border-radius: 4px;
+    max-height: 400px;
+    overflow: auto;
+}
+
+code {
+    font-family: 'Consolas', 'Monaco', monospace;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #666;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Animations */
+@keyframes slideIn {
+    from { transform: translateX(-10px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .monitor-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .toolbar {
+        flex-direction: column;
+    }
+    
+    .request-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .config-container {
+        flex-wrap: wrap;
+    }
+    
+    .config-status {
+        width: 100%;
+        margin-top: 10px;
+        border-top: 1px solid var(--input-border);
+        border-left: none;
+        padding-left: 0;
+        margin-left: 0;
+        padding-top: 10px;
+    }
+}
