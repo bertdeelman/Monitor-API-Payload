@@ -1,111 +1,76 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>API Traffic Monitor</title>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prismjs/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prismjs/1.29.0/components/prism-xml-doc.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prismjs/1.29.0/components/prism-json.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prismjs/1.29.0/themes/prism-tomorrow.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Monitor</title>
     <link rel="stylesheet" href="/styles/main.css">
+    <link href="/styles/prism.css" rel="stylesheet" />
 </head>
 <body>
     <div class="header">
-        <button class="theme-toggle" onclick="toggleTheme()">🌙 Theme</button>
-        <span id="status" class="status-inactive">Disconnected</span>
-        API Traffic Monitor
-    </div>
-    
-    <div class="config-panel">
-        <div class="config-container">
-            <input type="text" id="hostname" placeholder="Hostname" value="localhost">
-            <input type="number" id="port" placeholder="Port" value="80">
-            <button onclick="updateConfig()">Update Configuration</button>
-            <span class="config-status">Currently forwarding to: <span id="currentConfig">http://localhost:80</span></span>
+        <div>API Monitor</div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <div id="status" class="status-inactive">Disconnected</div>
+            <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
         </div>
     </div>
-        
-    <div class="monitor-grid">
-        <!-- Traffic Overview -->
-        <div class="monitor-card">
-            <div class="card-title">Traffic Overview</div>
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="stat-label">Total</div>
-                    <div class="stat-value" id="totalRequests">0</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-label">JSON</div>
-                    <div class="stat-value" id="jsonRequests">0</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-label">XML</div>
-                    <div class="stat-value" id="xmlRequests">0</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-label">Uptime</div>
-                    <div class="stat-value" id="uptime">0:00:00</div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Response Times -->
-        <div class="monitor-card">
-            <div class="card-title">Response Times</div>
-            <div class="response-stats">
-                <div class="response-current">
-                    <div id="currentResponseTime">0</div>
-                    <div class="label">ms (current)</div>
-                </div>
-                <div class="response-details">
-                    <div class="detail-item">
-                        <span class="label">Avg:</span>
-                        <span id="avgResponseTime">0ms</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="label">Min:</span>
-                        <span id="minResponseTime">0ms</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="label">Max:</span>
-                        <span id="maxResponseTime">0ms</span>
-                    </div>
-                </div>
-            </div>
+    <div class="stats-bar">
+        <div class="stat-chip">
+            Total Requests: <span id="totalRequests">0</span>
         </div>
-
-        <!-- Status Codes -->
-        <div class="monitor-card">
-            <div class="card-title">Response Status</div>
-            <div class="status-codes">
-                <div class="status-category success" id="status2xx">2xx: 0</div>
-                <div class="status-category warning" id="status4xx">4xx: 0</div>
-                <div class="status-category error" id="status5xx">5xx: 0</div>
-            </div>
+        <div class="stat-chip">
+            JSON: <span id="jsonRequests">0</span>
         </div>
-
-        <!-- Recent Endpoints -->
-        <div class="monitor-card">
-            <div class="card-title">Recent Endpoints</div>
-            <div class="endpoints-list" id="recentEndpoints"></div>
+        <div class="stat-chip">
+            XML: <span id="xmlRequests">0</span>
+        </div>
+        <div class="stat-chip">
+            Uptime: <span id="uptime">0:00:00</span>
+        </div>
+        <div class="status-pills">
+            <div id="status2xx" class="status-pill success">2xx: 0</div>
+            <div id="status4xx" class="status-pill warning">4xx: 0</div>
+            <div id="status5xx" class="status-pill error">5xx: 0</div>
         </div>
     </div>
 
     <div class="container">
         <div class="toolbar">
-            <input type="text" class="search-bar" id="searchInput" placeholder="Search requests..." onkeyup="filterRequests()">
+            <input type="text" id="searchInput" class="search-bar" placeholder="Search requests..." oninput="filterRequests()">
             <div class="toolbar-actions">
-                <button onclick="clearLogs()" class="action-button">Clear Logs</button>
-                <select id="filterType" onchange="filterRequests()" class="filter-select">
+                <select id="filterType" class="filter-select" onchange="filterRequests()">
                     <option value="all">All Types</option>
                     <option value="json">JSON</option>
                     <option value="xml">XML</option>
                 </select>
+                <button class="action-button" onclick="clearLogs()">Clear Logs</button>
             </div>
         </div>
+        
         <div id="logs"></div>
     </div>
 
+    <div class="fun-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                🚀 API Monitor - Making API testing a breeze
+            </div>
+            <div class="footer-details">
+                <span>Monitoring Port 80 ⟶ 8888</span>
+                <span>UI Available at Port 9000</span>
+                <span>Created with ❤️ by Ben de Ridder<br/>
+                      🤖 Happily crafted with the help of Claude.ai</span>
+            </div>
+            <div class="footer-version">
+                Version 2.0.0 - © 2024
+            </div>
+        </div>
+    </div>
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/scripts/prism.js"></script>
     <script src="/scripts/client.js"></script>
 </body>
 </html>

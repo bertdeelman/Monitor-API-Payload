@@ -12,16 +12,13 @@ class SocketHandler {
         this.io.on('connection', (socket) => {
             this.connectionCount++;
             
-            // Only log for first connection
             if (this.connectionCount === 1) {
                 console.log('Client connected to monitoring interface');
             }
 
-            // Send initial stats
-            socket.emit('stats', this.proxyHandler.getStats());
             socket.emit('configUpdated', this.proxyHandler.target);
+            socket.emit('stats', this.proxyHandler.getStats());
 
-            // Handle target configuration updates
             socket.on('updateConfig', (newConfig) => {
                 this.proxyHandler.updateTarget({
                     host: newConfig.hostname,
@@ -32,7 +29,7 @@ class SocketHandler {
             socket.on('disconnect', () => {
                 this.connectionCount--;
                 if (this.connectionCount === 0) {
-                    console.log('All clients disconnected from monitoring interface');
+                    console.log('Client disconnected from monitoring interface');
                 }
             });
         });

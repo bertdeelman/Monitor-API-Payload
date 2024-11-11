@@ -2,7 +2,6 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
-const config = require('./config/default');
 const ProxyHandler = require('./src/proxy/proxyHandler');
 const SocketHandler = require('./src/socketHandler');
 
@@ -10,6 +9,20 @@ const SocketHandler = require('./src/socketHandler');
 const app = express();
 const webServer = http.createServer(app);
 const io = new Server(webServer);
+
+// Static configuration
+const config = {
+    proxy: {
+        listenPort: 80,        // Main traffic now comes through port 80
+        target: {
+            host: 'localhost',
+            port: 8888         // Forward to IIS on 8888
+        }
+    },
+    web: {
+        port: 9000            // Monitoring interface remains on 9000
+    }
+};
 
 // Create proxy server
 const proxyHandler = new ProxyHandler(config.proxy);
@@ -27,25 +40,27 @@ app.get('/', (req, res) => {
 });
 
 // Start servers
-proxyServer.listen(config.proxy.port, () => {
+proxyServer.listen(config.proxy.listenPort, () => {
     console.clear();
     console.log('\x1b[42m%s\x1b[0m', ' API MONITOR STARTED ');
-    console.log(`Proxy server running on port ${config.proxy.port}`);
+    console.log('\x1b[36m%s\x1b[0m', `Proxy server running on port ${config.proxy.listenPort}`);
+    console.log('\x1b[36m%s\x1b[0m', `Forwarding to: http://localhost:${config.proxy.target.port}`);
 });
 
 webServer.listen(config.web.port, () => {
-    console.log(`Web interface available at: http://localhost:${config.web.port}`);
-    console.log('\nTo use:');
-    console.log(`1. Configure target API in the web interface (default: localhost:${config.proxy.defaultTarget.port})`);
-    console.log(`2. Send requests to localhost:${config.proxy.port}`);
+    console.log('\x1b[36m%s\x1b[0m', `Web interface available at: http://localhost:${config.web.port}`);
 });
 
 // Handle process termination
 process.on('SIGTERM', () => {
-    console.log('Shutting down...');
+    console.log('Shutting down gracefully...');
     proxyServer.close(() => {
         webServer.close(() => {
             process.exit(0);
         });
     });
+});
+
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error);
 });
