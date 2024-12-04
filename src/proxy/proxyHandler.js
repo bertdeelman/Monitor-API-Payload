@@ -156,6 +156,7 @@ class ProxyHandler extends EventEmitter {
         const messages = {
             200: 'Request successful',
             201: 'Created successfully',
+            202: 'Accepted',
             204: 'No Content',
             301: 'Moved Permanently',
             302: 'Found (Redirect)',
@@ -168,7 +169,7 @@ class ProxyHandler extends EventEmitter {
             502: 'Bad Gateway',
             503: 'Service Unavailable'
         };
-        return messages[statusCode] || `Status code: ${statusCode}`;
+        return messages[statusCode] || `Status code ${statusCode}`;
     }
 }
 

@@ -371,3 +371,41 @@ body {
 .footer-details span br {
     margin-bottom: 2px;  /* Small space between the two lines */
 }
+
+/* Code block styling */
+.code-block {
+    background: #f5f5f5;
+    padding: 15px;
+    border-radius: 4px;
+    margin: 10px 0;
+    font-family: Consolas, Monaco, 'Andale Mono', monospace;
+    font-size: 14px;
+    line-height: 1.4;
+    white-space: pre;
+    overflow-x: auto;
+}
+
+/* XML Syntax Highlighting */
+.xml-tag { color: #2973b7; font-weight: bold; }     /* Blue for tags */
+.xml-attr { color: #727272; }                       /* Grey for attributes */
+.xml-value { color: #42b983; }                      /* Green for values */
+
+/* JSON Syntax Highlighting */
+.json-key { color: #2973b7; }                       /* Blue for keys */
+.json-string { color: #42b983; }                    /* Green for strings */
+.json-number { color: #e96900; }                    /* Orange for numbers */
+.json-boolean { color: #9876aa; }                   /* Purple for booleans/null */
+
+/* Dark mode adjustments */
+.dark-mode .code-block {
+    background: #1a1a1a;
+}
+
+.dark-mode .xml-tag { color: #569cd6; }             /* Lighter blue for tags */
+.dark-mode .xml-attr { color: #9cdcfe; }            /* Light blue for attributes */
+.dark-mode .xml-value { color: #6a9955; }           /* Softer green for values */
+
+.dark-mode .json-key { color: #9cdcfe; }            /* Light blue for keys */
+.dark-mode .json-string { color: #6a9955; }         /* Softer green for strings */
+.dark-mode .json-number { color: #ce9178; }         /* Soft orange for numbers */
+.dark-mode .json-boolean { color: #c586c0; }        /* Soft purple for booleans/null */

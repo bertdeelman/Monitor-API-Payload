@@ -43,23 +43,51 @@ socket.on('request', (data) => {
 
 function formatPayload(payload, type) {
     try {
-        if (type === 'json') {
-            return JSON.stringify(JSON.parse(payload), null, 2)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;');
-        } else if (type === 'xml') {
-            return payload
+        if (!payload) return '';
+        
+        if (type === 'xml') {
+            // Format XML with indentation and line breaks
+            let formatted = payload.replace(/></g, '>\n<');
+            let depth = 0;
+            let lines = formatted.split('\n');
+            
+            formatted = lines.map(line => {
+                let indent = ' '.repeat(depth * 2);
+                if (line.match(/<\//)) depth--; // Closing tag
+                indent = ' '.repeat(depth * 2);
+                if (line.match(/<[^/].*[^/]>$/)) depth++; // Opening tag
+                return indent + line;
+            }).join('\n');
+            
+            // Color-code the XML
+            return formatted
                 .replace(/&/g, '&amp;')
                 .replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&apos;');
+                .replace(/(&lt;\/?\w+)([^&]*?)(&gt;)/g, '<span class="xml-tag">$1</span><span class="xml-attr">$2</span><span class="xml-tag">$3</span>')
+                .replace(/"([^"]*)"/g, '"<span class="xml-value">$1</span>"');
+        } 
+        else if (type === 'json') {
+            const obj = JSON.parse(payload);
+            return JSON.stringify(obj, null, 2)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/(".*?"):/g, '<span class="json-key">$1</span>:')
+                .replace(/: (".*?")/g, ': <span class="json-string">$1</span>')
+                .replace(/: (\d+)/g, ': <span class="json-number">$1</span>')
+                .replace(/: (true|false|null)/g, ': <span class="json-boolean">$1</span>');
         }
-        return payload;
+        return payload
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
     } catch (e) {
         console.error('Error formatting payload:', e);
-        return payload;
+        return payload
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
     }
 }
 
@@ -76,7 +104,7 @@ function addRequestToLog(data) {
                     `<span class="payload-type ${data.type}-type">${data.type.toUpperCase()}</span>` : 
                     ''}
                 <span class="response-status status-${Math.floor(data.statusCode/100)}xx">
-                    ${data.responseMessage}
+                    ${data.statusCode} - ${data.responseMessage}
                 </span>
             </div>
             <div class="request-actions">
@@ -90,15 +118,14 @@ function addRequestToLog(data) {
                 </button>
             </div>
         </div>
-        ${data.body ? `<pre><code class="language-${data.type}">${formatPayload(data.body, data.type)}</code></pre>` : ''}
+        ${data.body ? `<pre class="code-block ${data.type}-content">${formatPayload(data.body, data.type)}</pre>` : ''}
     `;
     
     requestDiv.innerHTML = content;
     logsDiv.insertBefore(requestDiv, logsDiv.firstChild);
-    Prism.highlightAll();
 
     // Auto-cleanup old requests if there are too many
-    if (logsDiv.children.length > 100) {
+    while (logsDiv.children.length > 100) {
         logsDiv.removeChild(logsDiv.lastChild);
     }
 }
@@ -111,11 +138,10 @@ Method: ${data.method}
 Content-Type: ${data.contentType || 'Not specified'}
 Type: ${data.type.toUpperCase()}
 Status: ${data.statusCode}
-Response: ${data.responseMessage}
 Response Time: ${data.responseTime}ms
 
 Payload:
-${data.body}`;
+${data.body || 'No payload'}`;
     
     navigator.clipboard.writeText(details)
         .then(() => {
@@ -142,7 +168,7 @@ function filterRequests() {
         const type = request.querySelector('.payload-type')?.textContent.toLowerCase() || '';
         
         const matchesSearch = text.includes(searchValue);
-        const matchesType = filterType === 'all' || type.includes(filterType);
+        const matchesType = filterType === 'all' || type === filterType;
         
         request.style.display = matchesSearch && matchesType ? '' : 'none';
     });
@@ -158,7 +184,7 @@ function clearLogs() {
     logsDiv.innerHTML = '';
 }
 
-// Initialize on page load
+// Initialize theme on page load
 document.addEventListener('DOMContentLoaded', () => {
     const savedDarkMode = localStorage.getItem('darkMode');
     if (savedDarkMode === 'true') {

@@ -1,29 +1,30 @@
 {
   "name": "api-monitor",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "API Traffic Monitor for XML and JSON requests",
   "main": "proxy.js",
+  "bin": "proxy.js",
+  "pkg": {
+    "assets": [
+      "public/**/*",
+      "views/**/*"
+    ],
+    "targets": [
+      "node18-win-x64"
+    ],
+    "outputPath": "dist"
+  },
   "scripts": {
     "start": "node proxy.js",
-    "dev": "nodemon proxy.js"
+    "build": "pkg ."
   },
-  "keywords": [
-    "api",
-    "monitor",
-    "proxy",
-    "xml",
-    "json"
-  ],
-  "author": "",
-  "license": "ISC",
+  "author": "Ben de Ridder",
   "dependencies": {
-    "express": "^4.18.2",
-    "http-proxy": "^1.18.1",
-    "moment": "^2.29.4",
-    "pretty": "^2.0.0",
-    "socket.io": "^4.7.2"
+    "express": "^4.17.1",
+    "minimist": "^1.2.8",
+    "socket.io": "^4.5.1"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "pkg": "^5.8.1"
   }
 }
