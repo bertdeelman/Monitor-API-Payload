@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>API Monitor</title>
-        <link rel="stylesheet" href="/styles/main.css">
-    </head>
-
-    
-    <body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Monitor</title>
+    <link rel="stylesheet" href="/styles/main.css">
+    <link href="/styles/prism.css" rel="stylesheet" />
+</head>
+<body>
     <div class="header">
         <div>API Monitor</div>
         <div style="display: flex; gap: 10px; align-items: center;">
@@ -32,6 +31,7 @@
         </div>
         <div class="status-pills">
             <div id="status2xx" class="status-pill success">2xx: 0</div>
+            <div id="status3xx" class="status-pill info">3xx: 0</div>
             <div id="status4xx" class="status-pill warning">4xx: 0</div>
             <div id="status5xx" class="status-pill error">5xx: 0</div>
         </div>
@@ -59,10 +59,10 @@
                 🚀 API Monitor - Making API testing a breeze
             </div>
             <div class="footer-details">
-                <span>Monitoring Port 80 ⟶ 8888</span>
+                <span>Monitoring Port 80 ⟶ 888</span>
                 <span>UI Available at Port 9000</span>
-                <span>Created with ❤️ by Ben de Ridder<br/>
-                      🤖 Happily crafted with the help of Claude.ai</span>
+                <span>Created with ❤️ by Bert Deelman<br/>
+                    🤖 Happily crafted with the help of Claude.ai</span>
             </div>
             <div class="footer-version">
                 Version 2.0.0 - © 2024

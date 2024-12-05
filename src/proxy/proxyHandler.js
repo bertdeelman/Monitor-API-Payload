@@ -1,26 +1,33 @@
 const http = require('http');
 const EventEmitter = require('events');
-const EndpointsMonitor = require('../monitors/endpoints');
-const ResponseTimeMonitor = require('../monitors/responseTime');
-const StatusCodesMonitor = require('../monitors/statusCodes');
 
 class ProxyHandler extends EventEmitter {
     constructor(config) {
         super();
         this.config = config;
-        this.target = config.target;
+        this.target = {
+            host: 'localhost',
+            port: config.defaultTarget.port
+        };
         
-        // Initialize monitors
-        this.endpointsMonitor = new EndpointsMonitor();
-        this.responseTimeMonitor = new ResponseTimeMonitor();
-        this.statusCodesMonitor = new StatusCodesMonitor();
-        
-        // Initialize basic stats
+        // Initialize stats
         this.stats = {
             totalRequests: 0,
             xmlRequests: 0,
             jsonRequests: 0,
-            startTime: Date.now()
+            startTime: Date.now(),
+            methodStats: {
+                GET: 0,
+                POST: 0,
+                PUT: 0,
+                DELETE: 0
+            },
+            statusCodes: {
+                '2xx': 0,
+                '3xx': 0,
+                '4xx': 0,
+                '5xx': 0
+            }
         };
     }
 
@@ -35,9 +42,7 @@ class ProxyHandler extends EventEmitter {
         clientReq.on('end', () => {
             // Update basic stats
             this.stats.totalRequests++;
-            
-            // Track endpoint
-            this.endpointsMonitor.addEndpoint(clientReq.url, clientReq.method);
+            this.stats.methodStats[clientReq.method] = (this.stats.methodStats[clientReq.method] || 0) + 1;
 
             const payloadType = this.detectPayloadType(requestBody, clientReq.headers['content-type']);
             
@@ -62,10 +67,6 @@ class ProxyHandler extends EventEmitter {
                 const endTime = Date.now();
                 const responseTime = endTime - startTime;
 
-                // Update monitors
-                this.responseTimeMonitor.addTime(responseTime);
-                this.statusCodesMonitor.addStatus(proxyRes.statusCode);
-
                 // Handle 302 redirects and other 3xx responses
                 if (proxyRes.statusCode >= 300 && proxyRes.statusCode < 400) {
                     let location = proxyRes.headers.location;
@@ -78,7 +79,11 @@ class ProxyHandler extends EventEmitter {
                     }
                 }
 
-                const responseMessage = `${proxyRes.statusCode} - ${this.getStatusMessage(proxyRes.statusCode)}`;
+                // Update status code stats
+                const statusCategory = `${Math.floor(proxyRes.statusCode / 100)}xx`;
+                this.stats.statusCodes[statusCategory] = (this.stats.statusCodes[statusCategory] || 0) + 1;
+
+                const responseMessage = this.getStatusMessage(proxyRes.statusCode);
 
                 this.emit('request', {
                     method: clientReq.method,
@@ -100,7 +105,7 @@ class ProxyHandler extends EventEmitter {
                 console.error('Proxy request error:', error);
                 if (!clientRes.headersSent) {
                     const errorMessage = `502 - Unable to reach ${this.target.host}:${this.target.port}`;
-                    this.statusCodesMonitor.addStatus(502);
+                    this.stats.statusCodes['5xx'] = (this.stats.statusCodes['5xx'] || 0) + 1;
                     
                     clientRes.writeHead(502);
                     clientRes.end(errorMessage);
@@ -126,17 +131,6 @@ class ProxyHandler extends EventEmitter {
         });
     }
 
-    getStats() {
-        return {
-            ...this.stats,
-            uptime: Date.now() - this.stats.startTime,
-            endpoints: this.endpointsMonitor.getStats(),
-            responseTimes: this.responseTimeMonitor.getStats(),
-            statusCodes: this.statusCodesMonitor.getStats()
-        };
-    }
-
-    // Utility methods remain the same
     detectPayloadType(body, contentType) {
         if (!body) return 'unknown';
         
@@ -170,6 +164,13 @@ class ProxyHandler extends EventEmitter {
             503: 'Service Unavailable'
         };
         return messages[statusCode] || `Status code ${statusCode}`;
+    }
+
+    getStats() {
+        return {
+            ...this.stats,
+            uptime: Date.now() - this.stats.startTime
+        };
     }
 }
 

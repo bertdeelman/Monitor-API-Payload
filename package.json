@@ -9,16 +9,15 @@
       "public/**/*",
       "views/**/*"
     ],
-    "targets": [
-      "node18-win-x64"
-    ],
+    "targets": [ "node18-win-x64" ],
     "outputPath": "dist"
   },
   "scripts": {
-    "start": "node proxy.js",
+    "start": "node proxy.js -source 80 -destination 888",
+    "dev": "node proxy.js",
     "build": "pkg ."
   },
-  "author": "Ben de Ridder",
+  "author": "Bert Deelman",
   "dependencies": {
     "express": "^4.17.1",
     "minimist": "^1.2.8",

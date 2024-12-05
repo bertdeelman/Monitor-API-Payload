@@ -31,6 +31,7 @@ socket.on('stats', (stats) => {
     // Update status codes
     if (stats.statusCodes) {
         document.getElementById('status2xx').textContent = `2xx: ${stats.statusCodes['2xx'] || 0}`;
+        document.getElementById('status3xx').textContent = `3xx: ${stats.statusCodes['3xx'] || 0}`;
         document.getElementById('status4xx').textContent = `4xx: ${stats.statusCodes['4xx'] || 0}`;
         document.getElementById('status5xx').textContent = `5xx: ${stats.statusCodes['5xx'] || 0}`;
     }
@@ -45,38 +46,18 @@ function formatPayload(payload, type) {
     try {
         if (!payload) return '';
         
-        if (type === 'xml') {
-            // Format XML with indentation and line breaks
-            let formatted = payload.replace(/></g, '>\n<');
-            let depth = 0;
-            let lines = formatted.split('\n');
-            
-            formatted = lines.map(line => {
-                let indent = ' '.repeat(depth * 2);
-                if (line.match(/<\//)) depth--; // Closing tag
-                indent = ' '.repeat(depth * 2);
-                if (line.match(/<[^/].*[^/]>$/)) depth++; // Opening tag
-                return indent + line;
-            }).join('\n');
-            
-            // Color-code the XML
-            return formatted
+        if (type === 'json') {
+            return JSON.stringify(JSON.parse(payload), null, 2)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        } else if (type === 'xml') {
+            return payload
                 .replace(/&/g, '&amp;')
                 .replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;')
-                .replace(/(&lt;\/?\w+)([^&]*?)(&gt;)/g, '<span class="xml-tag">$1</span><span class="xml-attr">$2</span><span class="xml-tag">$3</span>')
-                .replace(/"([^"]*)"/g, '"<span class="xml-value">$1</span>"');
-        } 
-        else if (type === 'json') {
-            const obj = JSON.parse(payload);
-            return JSON.stringify(obj, null, 2)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/(".*?"):/g, '<span class="json-key">$1</span>:')
-                .replace(/: (".*?")/g, ': <span class="json-string">$1</span>')
-                .replace(/: (\d+)/g, ': <span class="json-number">$1</span>')
-                .replace(/: (true|false|null)/g, ': <span class="json-boolean">$1</span>');
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&apos;');
         }
         return payload
             .replace(/&/g, '&amp;')
@@ -118,11 +99,13 @@ function addRequestToLog(data) {
                 </button>
             </div>
         </div>
-        ${data.body ? `<pre class="code-block ${data.type}-content">${formatPayload(data.body, data.type)}</pre>` : ''}
+        ${data.body ? `<pre><code class="language-${data.type}">${formatPayload(data.body, data.type)}</code></pre>` : ''}
     `;
     
     requestDiv.innerHTML = content;
     logsDiv.insertBefore(requestDiv, logsDiv.firstChild);
+    
+    Prism.highlightElement(requestDiv.querySelector('code'));
 
     // Auto-cleanup old requests if there are too many
     while (logsDiv.children.length > 100) {
@@ -168,7 +151,7 @@ function filterRequests() {
         const type = request.querySelector('.payload-type')?.textContent.toLowerCase() || '';
         
         const matchesSearch = text.includes(searchValue);
-        const matchesType = filterType === 'all' || type === filterType;
+        const matchesType = filterType === 'all' || type.includes(filterType);
         
         request.style.display = matchesSearch && matchesType ? '' : 'none';
     });
